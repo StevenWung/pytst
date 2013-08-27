@@ -9,6 +9,10 @@ NAME = "***"
 PASS = "***"
 FILE = "test.txt"
 
+OK = 0
+ERROR_DIR_NOT_EXIST = 100
+ERROR_DIR_DO_EXIST  = 101
+
 class FtpUploader(object):
     def __init__(self, host, username, password, base_dir='/'):
         self.bdir = base_dir
@@ -39,7 +43,14 @@ class FtpUploader(object):
         return False
     def _cd_dir(self,dir):
         dir = self.bdir + '/' + dir
-        self.ftp.cwd( dir )
+        try:
+            self.ftp.cwd( dir )
+        except Exception,e:
+            if  'The system cannot find the file specified' in e.message or \
+                'The directory name is invalid' in e.message:
+                return ERROR_DIR_NOT_EXIST
+            print e
+        return OK
     def upload_file(self,file_path, dest_path):
         if not self._dir_exist( dest_path ):
             self._mkdir( dest_path )
@@ -58,10 +69,30 @@ class FtpUploader(object):
         self.ftp.storbinary( "STOR " + rfile_path, file )
         file.close()
     def tree(self, dir):
+        list = []
         self._cd_dir( dir )
         for name in self.ftp.nlst(  ):
-            pass
-            print name
+            try_dir = dir + '/' + name
+            rt = self._cd_dir( try_dir )
+            if rt == ERROR_DIR_NOT_EXIST:
+                #is a file
+                #print "f "+try_dir
+                item = { 'file':try_dir }
+                list.append( item )
+            else:
+                #print "d "+try_dir
+                sublst = self.tree( try_dir )
+                if len( sublst ) == 0:
+                    item = {
+                        'dir' : try_dir,
+                    }
+                else:
+                    item = {
+                        'dir' : try_dir,
+                        'sub_dir' : sublst
+                    }
+                list.append( item )
+        return list
         pass
     def upload_dir(self, src_dir, dst_dir):
         pass
@@ -72,7 +103,9 @@ if __name__ == "__main__":
     cfg = json.load(open("py.conf", 'rb'))
     ftp = FtpUploader( cfg['host'], cfg['username'], cfg['password'] , '/ftp123898/Web')
     ftp.upload_file('test.txt', '2/3/4/6/index.html')
-    ftp.tree( '/' )
+    lst = ftp.tree( '2014/1024/steven/upload' )
+    print json.dumps(lst,  sort_keys=True, indent=4, separators=(',', ': ') )
+    #ftp._cd_dir('2/3/4/6/index.html')
     ftp.close()
 
 
