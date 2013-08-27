@@ -29,7 +29,6 @@ class FtpUploader(object):
             if ddir not in self.rdirs:
                 self.rdirs.append( ddir )
             try:
-                print ddir
                 self.ftp.mkd( ddir )
             except Exception, e:
                 pass
@@ -58,6 +57,12 @@ class FtpUploader(object):
         file = open( file_path , 'rb' )
         self.ftp.storbinary( "STOR " + rfile_path, file )
         file.close()
+    def tree(self, dir):
+        self._cd_dir( dir )
+        for name in self.ftp.nlst(  ):
+            pass
+            print name
+        pass
     def upload_dir(self, src_dir, dst_dir):
         pass
     def close(self):
@@ -67,6 +72,7 @@ if __name__ == "__main__":
     cfg = json.load(open("py.conf", 'rb'))
     ftp = FtpUploader( cfg['host'], cfg['username'], cfg['password'] , '/ftp123898/Web')
     ftp.upload_file('test.txt', '2/3/4/6/index.html')
+    ftp.tree( '/' )
     ftp.close()
 
 
