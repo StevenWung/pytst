@@ -3,9 +3,9 @@ import ftplib
 import logging
 
 logging.debug("this test")
-HOST = "ftp123898.host153.web522.com"
-NAME = "ftp123898"
-PASS = "qwertyuiop"
+HOST = "****"
+NAME = "***"
+PASS = "***"
 FILE = "test.txt"
 
 class FtpUploader(object):
