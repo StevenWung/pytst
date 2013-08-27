@@ -29,6 +29,7 @@ class FtpUploader(object):
             if ddir not in self.rdirs:
                 self.rdirs.append( ddir )
             try:
+                print ddir
                 self.ftp.mkd( ddir )
             except Exception, e:
                 pass
@@ -43,23 +44,29 @@ class FtpUploader(object):
     def upload_file(self,file_path, dest_path):
         if not self._dir_exist( dest_path ):
             self._mkdir( dest_path )
-        #cd
-        self._cd_dir( dest_path )
+
         #filename
         if dest_path.endswith('/'):
+            #/a/b/c/
             file_name = os.path.basename( file_path )
+            rfile_path = self.bdir + '/' + dest_path + '/' + file_name
         else:
+            #/a/b/c
             file_name = os.path.basename( dest_path )
+            rfile_path = self.bdir + '/' + dest_path
+        remote_file_path = dest_path
         file = open( file_path , 'rb' )
-        self.ftp.storbinary( "STOR " + file_name, file )
+        self.ftp.storbinary( "STOR " + rfile_path, file )
         file.close()
+    def upload_dir(self, src_dir, dst_dir):
+        pass
     def close(self):
         self.ftp.close()
 
 if __name__ == "__main__":
     cfg = json.load(open("py.conf", 'rb'))
-    ftp = FtpUploader( cfg['host'], cfg['username'], cfg['password'] , '/ftp123898/Web/')
-    ftp.upload_file('test.txt', '2014/1024/steven/upload/')
+    ftp = FtpUploader( cfg['host'], cfg['username'], cfg['password'] , '/ftp123898/Web')
+    ftp.upload_file('test.txt', '2/3/4/6/index.html')
     ftp.close()
 
 
