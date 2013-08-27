@@ -1,4 +1,5 @@
 import os
+import json
 import ftplib
 import logging
 
@@ -52,10 +53,16 @@ class FtpUploader(object):
         file = open( file_path , 'rb' )
         self.ftp.storbinary( "STOR " + file_name, file )
         file.close()
+    def close(self):
+        self.ftp.close()
+
+if __name__ == "__main__":
+    cfg = json.load(open("py.conf", 'rb'))
+    ftp = FtpUploader( cfg['host'], cfg['username'], cfg['password'] , '/ftp123898/Web/')
+    ftp.upload_file('test.txt', '2014/1024/steven/upload/')
+    ftp.close()
 
 
-ftp = FtpUploader( HOST, NAME, PASS , '/ftp123898/Web/static/')
-ftp.upload_file('test.txt', '2014/1024/steven/upload/')
 '''
 conn = ftplib.FTP( HOST, NAME, PASS )
 dir = '/ftp123898/Web/static/pictures/'
