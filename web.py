@@ -9,7 +9,7 @@ class TestWebA(tornado.web.RequestHandler):
 
 class TestWebB(tornado.web.RequestHandler):
 	def get(self):
-		self.write('shit b')
+        self.write('shit b')
 
 applicationa = tornado.web.Application([
 	('/a', TestWebA)
@@ -17,7 +17,7 @@ applicationa = tornado.web.Application([
 applicationa.listen(19090)
 
 applicationb = tornado.web.Application([
-	('/b', TestWebB)
+	('/b', TestWebB) 
 ])
 applicationb.listen(19091)
 
